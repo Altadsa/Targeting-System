@@ -9,6 +9,8 @@ public class FirstPersonCamera : MonoBehaviour
     [SerializeField] Transform _fpView;
     PlayerController _player;
 
+    const float MAX_VERTICAL = 75f;
+
     private void Awake()
     {
         _player = FindObjectOfType<PlayerController>();
@@ -32,19 +34,17 @@ public class FirstPersonCamera : MonoBehaviour
             {
                 delta = 1;
             }
-
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, delta);
             transform.position = Vector3.Lerp(transform.position, _fpView.position, delta);
             yield return new WaitForEndOfFrame();
         }
         _player.CanMove = false;
         _canMoveCamera = true;
-        transform.rotation = Quaternion.identity;
-        Debug.Log("End Reached;");
     }
 
     private void OnDisable()
     {
-        
+        _player.CanMove = true;
     }
 
     bool _canMoveCamera = false;
@@ -54,16 +54,26 @@ public class FirstPersonCamera : MonoBehaviour
 
     private void Update()
     {
-        x = Input.GetAxisRaw("Horizontal");
-        z = Input.GetAxisRaw("Vertical");
+        z = -Input.GetAxisRaw("Vertical");
         if (_canMoveCamera)
         {
-            xAngle += x * Speed * Time.deltaTime;
             zAngle += z * Speed * Time.deltaTime;
-            transform.rotation = Quaternion.AngleAxis(xAngle, Vector3.up) * Quaternion.AngleAxis(zAngle, Vector3.right);
+            transform.rotation = Quaternion.AngleAxis(_player.transform.eulerAngles.y, Vector3.up) *  Quaternion.AngleAxis(zAngle, Vector3.right);
+            ClampVerticalView();
         }
 
+    }
 
+    private void ClampVerticalView()
+    {
+        var euler = transform.eulerAngles;
+        euler.x = Mathf.Clamp(euler.x, -MAX_VERTICAL, MAX_VERTICAL);
+        transform.eulerAngles = euler;
+    }
+
+    private void LateUpdate()
+    {
+        transform.position = _fpView.position;
     }
 
 }

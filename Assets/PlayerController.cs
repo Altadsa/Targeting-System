@@ -31,19 +31,22 @@ public class PlayerController : MonoBehaviour
         if (Z_TargetLockon.HasTarget)
         {
             GetComponent<Animator>().SetBool("HasTarget", true);
-            Model.forward = Vector3.Scale(GetTargetForward(), new Vector3(1,0,1).normalized);
+            transform.forward = Vector3.Scale(GetTargetForward(), new Vector3(1,0,1).normalized);
         }
         else
         {
             GetComponent<Animator>().SetBool("HasTarget", false);
             GetComponent<Animator>().SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z));
-            Model.forward = transform.forward;
         }
         if (z < 0) z /= 2;
         if (CanMove)
+        {
             transform.position += CameraMovement * moveSpeed * Time.deltaTime;
+        }
+
         var newfacingDir = HasInput ? CameraMovement.normalized : transform.forward;
         transform.forward = Vector3.Lerp(transform.forward, newfacingDir, Time.deltaTime);
+
     }
 
     private Vector3 GetTargetForward()
@@ -52,12 +55,6 @@ public class PlayerController : MonoBehaviour
         newForward.y = 0;
         newForward.Normalize();
         return newForward;
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawRay(Model.position, Model.forward * 5f);
     }
 
 }
