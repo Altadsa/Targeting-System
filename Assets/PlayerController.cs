@@ -1,17 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class PlayerController : MonoBehaviour
 {
+
     public float moveSpeed = 10;
+    public Transform Model;
 
     Camera _mainCamera;
     private float x, z;
 
     private Vector3 CameraMovement => _mainCamera.ScaledForward() * z + _mainCamera.ScaledRight() * x;
 
-    private Vector3 ForwardMovement => transform.forward * z + transform.right * x;
+    private bool HasInput => Mathf.Abs(x) > Mathf.Epsilon || Mathf.Abs(z) > Mathf.Epsilon;
 
     private void Awake()
     {
@@ -25,17 +29,19 @@ public class PlayerController : MonoBehaviour
         if (Z_TargetLockon.HasTarget)
         {
             GetComponent<Animator>().SetBool("HasTarget", true);
-            transform.forward = GetTargetForward();
-            if (z < 0) z /= 2;
-            transform.position += ForwardMovement * moveSpeed * Time.deltaTime;
+            Model.forward = Vector3.Scale(GetTargetForward(), new Vector3(1,0,1).normalized);
         }
         else
         {
             GetComponent<Animator>().SetBool("HasTarget", false);
             GetComponent<Animator>().SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z));
-            transform.position += CameraMovement * moveSpeed * Time.deltaTime;
+            Model.forward = transform.forward;
         }
-
+        if (z < 0) z /= 2;
+        
+        transform.position += CameraMovement * moveSpeed * Time.deltaTime;
+        var newfacingDir = HasInput ? CameraMovement.normalized : transform.forward;
+        transform.forward = Vector3.Lerp(transform.forward, newfacingDir, Time.deltaTime);
     }
 
     private Vector3 GetTargetForward()
@@ -44,6 +50,12 @@ public class PlayerController : MonoBehaviour
         newForward.y = 0;
         newForward.Normalize();
         return newForward;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawRay(Model.position, Model.forward * 5f);
     }
 
 }
