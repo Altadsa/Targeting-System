@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
 
     private bool HasInput => Mathf.Abs(x) > Mathf.Epsilon || Mathf.Abs(z) > Mathf.Epsilon;
 
+    public bool CanMove = true;
+
     private void Awake()
     {
         _mainCamera = Camera.main;
@@ -38,8 +40,8 @@ public class PlayerController : MonoBehaviour
             Model.forward = transform.forward;
         }
         if (z < 0) z /= 2;
-        
-        transform.position += CameraMovement * moveSpeed * Time.deltaTime;
+        if (CanMove)
+            transform.position += CameraMovement * moveSpeed * Time.deltaTime;
         var newfacingDir = HasInput ? CameraMovement.normalized : transform.forward;
         transform.forward = Vector3.Lerp(transform.forward, newfacingDir, Time.deltaTime);
     }
