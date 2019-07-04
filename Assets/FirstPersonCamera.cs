@@ -1,15 +1,20 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FirstPersonCamera : MonoBehaviour
 {
-    float x, z;
+
     public float Speed = 10;
     [SerializeField] Transform _fpView;
     PlayerController _player;
 
     const float MAX_VERTICAL = 75f;
+
+    float  _verticalThrow;
+    float _moveStart = 0;
+    float _moveDuration = 1;
+    float _verticalAngle = 0;
+    bool _canMoveCamera = false;
 
     private void Awake()
     {
@@ -21,15 +26,14 @@ public class FirstPersonCamera : MonoBehaviour
         StartCoroutine(MoveToView());
     }
 
-    float sT = 0;
-    float duration = 1;
     IEnumerator MoveToView()
     {
-        sT = Time.time;
-        while (Time.time - sT < duration)
+        _player.CanMove = false;
+        _moveStart = Time.time;
+        while (Time.time - _moveStart < _moveDuration)
         {
-            var delta = Time.time - sT;
-            delta /= duration;
+            var delta = Time.time - _moveStart;
+            delta /= _moveDuration;
             if (delta > 1)
             {
                 delta = 1;
@@ -38,7 +42,6 @@ public class FirstPersonCamera : MonoBehaviour
             transform.position = Vector3.Lerp(transform.position, _fpView.position, delta);
             yield return new WaitForEndOfFrame();
         }
-        _player.CanMove = false;
         _canMoveCamera = true;
     }
 
@@ -47,28 +50,17 @@ public class FirstPersonCamera : MonoBehaviour
         _player.CanMove = true;
     }
 
-    bool _canMoveCamera = false;
-
-    float xAngle = 0;
-    float zAngle = 0;
-
     private void Update()
     {
-        z = -Input.GetAxisRaw("Vertical");
+        _verticalThrow = -Input.GetAxisRaw("Vertical");
         if (_canMoveCamera)
         {
-            zAngle += z * Speed * Time.deltaTime;
-            transform.rotation = Quaternion.AngleAxis(_player.transform.eulerAngles.y, Vector3.up) *  Quaternion.AngleAxis(zAngle, Vector3.right);
-            //ClampVerticalView();
+            _verticalAngle += _verticalThrow * Speed * Time.deltaTime;
+            var horizontalRot = Quaternion.AngleAxis(_player.transform.eulerAngles.y, Vector3.up);
+            var verticalRot = Quaternion.AngleAxis(_verticalAngle, Vector3.right);
+            transform.rotation = horizontalRot * verticalRot;
         }
 
-    }
-
-    private void ClampVerticalView()
-    {
-        var euler = transform.eulerAngles;
-        euler.x = Mathf.Clamp(euler.x, -MAX_VERTICAL, MAX_VERTICAL);
-        transform.eulerAngles = euler;
     }
 
     private void LateUpdate()

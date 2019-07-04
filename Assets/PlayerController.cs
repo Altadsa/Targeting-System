@@ -28,15 +28,18 @@ public class PlayerController : MonoBehaviour
     {
         x = Input.GetAxisRaw("Horizontal");
         z = Input.GetAxisRaw("Vertical");
+        var newfacingDir = HasInput ? CameraMovement.normalized : transform.forward;
         if (Z_TargetLockon.HasTarget)
         {
             GetComponent<Animator>().SetBool("HasTarget", true);
             transform.forward = Vector3.Scale(GetTargetForward(), new Vector3(1,0,1).normalized);
+            Model.forward = GetTargetForward();
         }
         else
         {
             GetComponent<Animator>().SetBool("HasTarget", false);
             GetComponent<Animator>().SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z));
+            Model.forward = newfacingDir;
         }
         if (z < 0) z /= 2;
         if (CanMove)
@@ -44,7 +47,8 @@ public class PlayerController : MonoBehaviour
             transform.position += CameraMovement * moveSpeed * Time.deltaTime;
         }
 
-        var newfacingDir = HasInput ? CameraMovement.normalized : transform.forward;
+
+
         transform.forward = Vector3.Lerp(transform.forward, newfacingDir, Time.deltaTime);
 
     }
@@ -55,6 +59,14 @@ public class PlayerController : MonoBehaviour
         newForward.y = 0;
         newForward.Normalize();
         return newForward;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawRay(transform.position, transform.forward * 10);
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(Model.position, Model.forward * 10);
     }
 
 }

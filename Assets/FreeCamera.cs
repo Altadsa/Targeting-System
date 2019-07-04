@@ -5,13 +5,15 @@ public class FreeCamera : MonoBehaviour
 {
     //Transform of the Player
     public Transform Player;
-    //Free Camera Offset
-    public Vector3 Offset;
+    //Free Camera PositionOffset
+    public Vector3 PositionOffset;
+    //LookAt Position Offset
+    public Vector3 LookAtOffset;
     //Distance behind the Player to move to
     public float MaxDistance = 3f;
 
     //Property to get the desired position behind the Player
-    private Vector3 CameraPosition => Player.position - Player.forward * MaxDistance + Offset;
+    private Vector3 CameraPosition => Player.position - Player.forward * MaxDistance + PositionOffset;
 
     private bool _isInitialized = false;
 
@@ -42,7 +44,7 @@ public class FreeCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        transform.LookAt(Player);
+        transform.LookAt(Player.position + LookAtOffset);
         if (_isInitialized)
         {
             var distance = Vector3.Distance(transform.position, CameraPosition);

@@ -6,6 +6,7 @@ public class TargetingCamera : MonoBehaviour
     public Transform Player;
     public Transform Target;
     public Vector3 Offset;
+    public float SpeedOffset = 5;
 
     //The angle between the midpoint of the Targets and the Camera
     private const float OFFSET = 30;
@@ -46,7 +47,7 @@ public class TargetingCamera : MonoBehaviour
         if (Target)
         {
             var newPosition = TargetingPosition();
-            transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * SpeedOffset);
             transform.forward = (_targetMidpoint - transform.position).normalized;
         }
         else
