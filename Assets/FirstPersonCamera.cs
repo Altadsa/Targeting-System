@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class FirstPersonCamera : MonoBehaviour
+public class FirstPersonCamera : PlayerCamera
 {
 
     public float Speed = 10;
@@ -11,10 +10,7 @@ public class FirstPersonCamera : MonoBehaviour
     const float MAX_VERTICAL = 75f;
 
     float  _verticalThrow;
-    float _moveStart = 0;
-    float _moveDuration = 1;
     float _verticalAngle = 0;
-    bool _canMoveCamera = false;
 
     private void Awake()
     {
@@ -23,26 +19,7 @@ public class FirstPersonCamera : MonoBehaviour
 
     private void OnEnable()
     {
-        StartCoroutine(MoveToView());
-    }
-
-    IEnumerator MoveToView()
-    {
-        _player.CanMove = false;
-        _moveStart = Time.time;
-        while (Time.time - _moveStart < _moveDuration)
-        {
-            var delta = Time.time - _moveStart;
-            delta /= _moveDuration;
-            if (delta > 1)
-            {
-                delta = 1;
-            }
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, delta);
-            transform.position = Vector3.Lerp(transform.position, _fpView.position, delta);
-            yield return new WaitForEndOfFrame();
-        }
-        _canMoveCamera = true;
+        StartCoroutine(MoveToPosition(_fpView.position));
     }
 
     private void OnDisable()
@@ -53,14 +30,13 @@ public class FirstPersonCamera : MonoBehaviour
     private void Update()
     {
         _verticalThrow = -Input.GetAxisRaw("Vertical");
-        if (_canMoveCamera)
+        if (_inPosition)
         {
             _verticalAngle += _verticalThrow * Speed * Time.deltaTime;
             var horizontalRot = Quaternion.AngleAxis(_player.transform.eulerAngles.y, Vector3.up);
             var verticalRot = Quaternion.AngleAxis(_verticalAngle, Vector3.right);
             transform.rotation = horizontalRot * verticalRot;
         }
-
     }
 
     private void LateUpdate()
