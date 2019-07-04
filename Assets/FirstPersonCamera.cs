@@ -59,7 +59,7 @@ public class FirstPersonCamera : MonoBehaviour
         {
             zAngle += z * Speed * Time.deltaTime;
             transform.rotation = Quaternion.AngleAxis(_player.transform.eulerAngles.y, Vector3.up) *  Quaternion.AngleAxis(zAngle, Vector3.right);
-            ClampVerticalView();
+            //ClampVerticalView();
         }
 
     }
