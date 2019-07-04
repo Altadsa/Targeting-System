@@ -19,14 +19,11 @@ public class CameraController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
-            EnableFirstPerson();
+            if (!_fCam.enabled)
+                EnableFirstPerson();
+            else
+                DisableFirstPerson();
         }
-
-        if (_fCam.enabled && Input.GetKeyDown(KeyCode.R))
-        {
-            DisableFirstPerson();
-        }
-
         if (Input.GetKey(KeyCode.LeftShift))
         {
             _zCam.enabled = true;

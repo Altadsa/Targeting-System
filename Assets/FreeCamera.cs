@@ -47,8 +47,14 @@ public class FreeCamera : MonoBehaviour
         transform.LookAt(Player.position + LookAtOffset);
         if (_isInitialized)
         {
-            var distance = Vector3.Distance(transform.position, CameraPosition);
-            transform.position = Vector3.Lerp(transform.position, CameraPosition, Time.deltaTime * distance);
+            var distance = Vector3.Distance(Player.position, CameraPosition);
+            Debug.Log(distance );
+            if (distance > MaxDistance)
+            {
+                _isInitialized = false;
+                StartCoroutine(MoveToView());
+            }
+            //transform.position = Vector3.Lerp(transform.position, CameraPosition, Time.deltaTime * distance);
         }
     }
 
