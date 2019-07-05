@@ -1,13 +1,14 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
-public class DebugHookshot : MonoBehaviour
+public class Hookshot : MonoBehaviour
 {
 
     public float Distance = 10;
     public Transform Hook;
     LineRenderer _lineRenderer;
-    private bool launched;
+    private bool _launched;
     private Camera _main;
     private Vector3 _destination;
 
@@ -23,26 +24,25 @@ public class DebugHookshot : MonoBehaviour
         _main = Camera.main;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.H) && !launched)
+        if (Input.GetKeyDown(KeyCode.H) && !_launched)
         {
-            launched = true;
+            _launched = true;
             _destination = _main.transform.position + _main.transform.forward * Distance;
             _shotStart = Time.time;
             Hook.forward = (_destination - transform.position).normalized;
             _lineRenderer.enabled = true;
         }
 
-        if (launched)
+        if (_launched)
         {
             var delta = Time.time - _shotStart;
             delta /= _shotduration;
             if (delta > 1)
             {
                 delta = 1;
-                launched = false;
+                _launched = false;
             }
             var distanceToDestination = Vector3.Distance(Hook.position, _destination);
             Hook.position = Vector3.Lerp(Hook.position, _destination, delta / distanceToDestination);
@@ -56,5 +56,33 @@ public class DebugHookshot : MonoBehaviour
         
     }
 
+    public void HookToPosition(Vector3 position)
+    {
+        _launched = false;
+        StartCoroutine(PullPlayer(position));
+    }
+
+    IEnumerator PullPlayer(Vector3 position)
+    {
+        var player = FindObjectOfType<PlayerController>().GetComponent<Rigidbody>();
+        var dir = position - player.transform.position;
+        var newPosition = position - dir.normalized * 2.5f;
+        var startTime = Time.time;
+        var duration = 1.5f;
+        while (Time.time - startTime < duration)
+        {
+            var delta = Time.time - startTime;
+            delta /= duration;
+            if (delta > 1)
+            {
+                delta = 1;
+            }
+
+            var distanceToPosition = Vector3.Distance(player.transform.position, newPosition);
+
+            player.position = Vector3.Lerp(player.transform.position, newPosition, delta / distanceToPosition);
+            yield return new WaitForEndOfFrame();
+        }
+    }
 
 }

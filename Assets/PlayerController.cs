@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.Tilemaps;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -61,12 +57,12 @@ public class PlayerController : MonoBehaviour
         return newForward;
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawRay(transform.position, transform.forward * 10);
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(Model.position, Model.forward * 10);
-    }
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.blue;
+    //    Gizmos.DrawRay(transform.position, transform.forward * 10);
+    //    Gizmos.color = Color.red;
+    //    Gizmos.DrawRay(Model.position, Model.forward * 10);
+    //}
 
 }

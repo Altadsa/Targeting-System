@@ -1,12 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
     FreeCamera _freeCam;
     TargetingCamera _zCam;
     FirstPersonCamera _fCam;
+
+
 
     private void Awake()
     {
@@ -29,6 +29,7 @@ public class CameraController : MonoBehaviour
             _zCam.enabled = true;
             _freeCam.enabled = false;
             _fCam.enabled = false;
+
         }
         else
         {
@@ -40,17 +41,19 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    private void EnableFirstPerson()
+    public void EnableFirstPerson()
     {
         _fCam.enabled = true;
         _freeCam.enabled = false;
     }
 
-    private void DisableFirstPerson()
+    public void DisableFirstPerson()
     {
         _fCam.enabled = false;
         _freeCam.enabled = true;
     }
-    
+
+
+
 
 }

@@ -19,6 +19,7 @@ public class FirstPersonCamera : PlayerCamera
 
     private void OnEnable()
     {
+        _player.CanMove = false;
         StartCoroutine(MoveToPosition(_fpView.position));
     }
 
