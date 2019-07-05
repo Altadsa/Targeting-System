@@ -12,7 +12,7 @@ public class TargetingCamera : MonoBehaviour
     public LayerMask LayerMask;
 
     //The angle between the midpoint of the Targets and the Camera
-    private const float OFFSET = 30;
+    private const float OFFSET = 45;
 
     // Directional Vector between the Player and Target
     private Vector3 _midpointVector;
@@ -56,7 +56,8 @@ public class TargetingCamera : MonoBehaviour
         {
             var newPosition = TargetingPosition();
             transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * SpeedOffset);
-            transform.forward = (_targetMidpoint - transform.position).normalized;
+            //transform.forward = (_targetMidpoint - transform.position).normalized;
+            transform.LookAt(_targetMidpoint);
         }
         else
         {
@@ -69,7 +70,7 @@ public class TargetingCamera : MonoBehaviour
     private Vector3 TargetingPosition()
     {
         var rot = !_directionToRotate ? OFFSET : -OFFSET;
-        var rotFor = Quaternion.AngleAxis(rot, Vector3.up) * -_midpointVector.normalized;
+        var rotFor = Quaternion.AngleAxis(rot, Vector3.up) * -Vector3.Scale(_midpointVector, new Vector3(1,0,1)).normalized;
         return Player.position + rotFor * TargetingDistance + Offset;
     }
 

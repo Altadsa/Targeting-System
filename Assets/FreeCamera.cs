@@ -30,10 +30,10 @@ public class FreeCamera : PlayerCamera
         if (_inPosition)
         {
             var distance = Vector3.Distance(transform.position, CameraPosition);
-            bool colliding = Physics.Raycast(transform.position, transform.forward, out hit, MaxDistance, ~(LayerMask));
+            bool colliding = Physics.Raycast(transform.position, transform.forward, out hit, Vector3.Distance(transform.position, Player.position), ~(LayerMask));
             if (colliding) Debug.Log(hit.collider.gameObject.name);
             var movePosition = colliding ? hit.point : CameraPosition;
-            transform.position = Vector3.Lerp(transform.position, movePosition, Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, movePosition, Time.deltaTime * distance);
         }
     }
 
