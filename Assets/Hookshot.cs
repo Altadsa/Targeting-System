@@ -29,10 +29,12 @@ public class Hookshot : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H) && !_launched)
         {
             _launched = true;
-            _destination = _main.transform.position + _main.transform.forward * Distance;
+            var camWorldPoint = _main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, Distance));
+            _destination = camWorldPoint;
             _shotStart = Time.time;
             Hook.forward = (_destination - transform.position).normalized;
             _lineRenderer.enabled = true;
+            _lineRenderer.SetPosition(0, transform.position);
         }
 
         if (_launched)

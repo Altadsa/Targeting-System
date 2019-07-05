@@ -19,13 +19,13 @@ public class FirstPersonCamera : PlayerCamera
 
     private void OnEnable()
     {
-        _player.CanMove = false;
-        StartCoroutine(MoveToPosition(_fpView.position));
+        _player.DisableMovement();
+        StartCoroutine(MoveToPosition(_fpView));
     }
 
     private void OnDisable()
     {
-        _player.CanMove = true;
+        _player.AllowMovement();
     }
 
     private void Update()
@@ -42,7 +42,8 @@ public class FirstPersonCamera : PlayerCamera
 
     private void LateUpdate()
     {
-        transform.position = _fpView.position;
+        if (_inPosition)
+            transform.position = _fpView.position;
     }
 
 }

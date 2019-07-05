@@ -14,7 +14,6 @@ public class HookshotCollider : MonoBehaviour
             FindObjectOfType<CameraController>().DisableFirstPerson();
             _hookshot.HookToPosition(transform.position);
         }
-        Debug.Log($"Trigger Object {other.gameObject.name}");
     }
 
 }

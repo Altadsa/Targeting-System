@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+
 public class PlayerController : MonoBehaviour
 {
 
@@ -13,7 +14,7 @@ public class PlayerController : MonoBehaviour
 
     private bool HasInput => Mathf.Abs(x) > Mathf.Epsilon || Mathf.Abs(z) > Mathf.Epsilon;
 
-    public bool CanMove = true;
+    private bool _canMove = true;
 
     private void Awake()
     {
@@ -35,18 +36,29 @@ public class PlayerController : MonoBehaviour
         {
             GetComponent<Animator>().SetBool("HasTarget", false);
             GetComponent<Animator>().SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z));
-            Model.forward = newfacingDir;
+            if (_canMove)
+                Model.forward = HasInput ? CameraMovement.normalized : Model.forward;
         }
         if (z < 0) z /= 2;
-        if (CanMove)
+        if (_canMove)
         {
             transform.position += CameraMovement * moveSpeed * Time.deltaTime;
         }
-
-
-
         transform.forward = Vector3.Lerp(transform.forward, newfacingDir, Time.deltaTime);
+    }
 
+    public void AllowMovement()
+    {
+        _canMove = true;
+        transform.forward = _mainCamera.ScaledForward();
+        Model.forward = _mainCamera.ScaledForward();
+    }
+
+    public void DisableMovement()
+    {
+        _canMove = false;
+        transform.forward = Model.forward;
+        Model.forward = transform.forward;
     }
 
     private Vector3 GetTargetForward()
@@ -57,12 +69,12 @@ public class PlayerController : MonoBehaviour
         return newForward;
     }
 
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.blue;
-    //    Gizmos.DrawRay(transform.position, transform.forward * 10);
-    //    Gizmos.color = Color.red;
-    //    Gizmos.DrawRay(Model.position, Model.forward * 10);
-    //}
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawRay(transform.position, transform.forward * 10);
+        Gizmos.color = Color.red;
+        //Gizmos.DrawRay(Model.position, Model.forward * 10);
+    }
 
 }

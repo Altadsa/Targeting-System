@@ -25,12 +25,6 @@ public class FreeCamera : PlayerCamera
         transform.LookAt(Player.position + LookAtOffset);
         if (_inPosition)
         {
-            //var distance = Vector3.Distance(Player.position, transform.position);
-            //if (distance > MaxDistance)
-            //{
-            //    _inPosition = false;
-            //    StartCoroutine(MoveToPosition(CameraPosition));
-            //}
             var distance = Vector3.Distance(transform.position, CameraPosition);
             transform.position = Vector3.Lerp(transform.position, CameraPosition, Time.deltaTime * distance);
         }

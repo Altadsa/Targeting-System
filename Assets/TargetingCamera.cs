@@ -31,6 +31,9 @@ public class TargetingCamera : MonoBehaviour
         Target = GetTarget();
         if (!Target)
             _fixedForward = transform.forward;
+        else
+            Z_TargetLockon.Target = Target;
+
     }
 
 
@@ -72,7 +75,7 @@ public class TargetingCamera : MonoBehaviour
 
     private Transform GetTarget()
     {
-        var targets = Physics.OverlapBox(Player.position, new Vector3(20, 20, 20), Quaternion.identity, LayerMask).ToList();
+        var targets = Physics.OverlapBox(Player.position + Player.forward*10, new Vector3(20, 10, 10), Quaternion.identity, LayerMask).ToList();
         if (targets.Count == 0) return null;
         var frontTargets = targets.Where(t =>
             Vector3.Dot(Player.forward,
