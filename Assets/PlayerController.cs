@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
+using UnityEngine.Tilemaps;
 
 
 public class PlayerController : MonoBehaviour
 {
-
+    public TargetingCamera _targetingCamera;
     public float moveSpeed = 10;
     public Transform Model;
 
@@ -26,10 +27,10 @@ public class PlayerController : MonoBehaviour
         x = Input.GetAxisRaw("Horizontal");
         z = Input.GetAxisRaw("Vertical");
         var newfacingDir = HasInput ? CameraMovement.normalized : transform.forward;
-        if (Z_TargetLockon.HasTarget)
+        if (_targetingCamera.enabled)
         {
             GetComponent<Animator>().SetBool("HasTarget", true);
-            transform.forward = Vector3.Scale(GetTargetForward(), new Vector3(1,0,1).normalized);
+            transform.forward = Vector3.Scale(GetTargetForward(), new Vector3(1, 0, 1).normalized);
             Model.forward = GetTargetForward();
         }
         else
@@ -63,7 +64,8 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 GetTargetForward()
     {
-        var newForward = Z_TargetLockon.Target.transform.position - transform.position;
+        if (!_targetingCamera.Target) return Model.forward;
+        var newForward = _targetingCamera.Target.position - transform.position;
         newForward.y = 0;
         newForward.Normalize();
         return newForward;

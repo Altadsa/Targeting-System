@@ -30,7 +30,7 @@ public class TargetingCamera : MonoBehaviour
     {
         Target = GetTarget();
         if (!Target)
-            _fixedForward = transform.forward;
+            _fixedForward = Player.forward;
         else
             Z_TargetLockon.Target = Target;
 
