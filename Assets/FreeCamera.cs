@@ -12,6 +12,8 @@ public class FreeCamera : PlayerCamera
     //Distance behind the Player to move to
     public float MaxDistance = 3f;
 
+    public LayerMask LayerMask;
+
     //Property to get the desired position behind the Player
     private Vector3 CameraPosition => Player.position - Player.forward * MaxDistance + PositionOffset;
 
@@ -20,14 +22,25 @@ public class FreeCamera : PlayerCamera
         StartCoroutine(MoveToPosition(CameraPosition));
     }
 
+
+    RaycastHit hit;
     private void LateUpdate()
     {
         transform.LookAt(Player.position + LookAtOffset);
         if (_inPosition)
         {
             var distance = Vector3.Distance(transform.position, CameraPosition);
-            transform.position = Vector3.Lerp(transform.position, CameraPosition, Time.deltaTime * distance);
+            bool colliding = Physics.Raycast(transform.position, transform.forward, out hit, MaxDistance, ~(LayerMask));
+            if (colliding) Debug.Log(hit.collider.gameObject.name);
+            var movePosition = colliding ? hit.point : CameraPosition;
+            transform.position = Vector3.Lerp(transform.position, movePosition, Time.deltaTime);
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawRay(transform.position, transform.forward*MaxDistance);
     }
 
 }
