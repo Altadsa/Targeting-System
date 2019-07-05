@@ -5,6 +5,7 @@ public class FirstPersonCamera : PlayerCamera
 
     public float Speed = 10;
     [SerializeField] Transform _fpView;
+    [SerializeField] UiHookshot _hookshotUi;
     PlayerController _player;
 
     const float MAX_VERTICAL = 75f;
@@ -21,11 +22,13 @@ public class FirstPersonCamera : PlayerCamera
     {
         _player.DisableMovement();
         StartCoroutine(MoveToPosition(_fpView));
+        _hookshotUi.ShowUi();
     }
 
     private void OnDisable()
     {
         _player.AllowMovement();
+        _hookshotUi.HideUi();
     }
 
     private void Update()
