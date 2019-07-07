@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Linq;
-using TMPro;
 using UnityEngine;
 
 public class TargetingCamera : PlayerCamera
@@ -57,14 +56,14 @@ public class TargetingCamera : PlayerCamera
     {
         if (Target)
         {
-            var newPosition = TargetingPosition();
+            var newPosition = CheckForCollision(_targetMidpoint, TargetingPosition());
             transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * SpeedOffset);
             transform.LookAt(_targetMidpoint);
         }
         else
         {
             if (_inPosition)
-                transform.position = FixedFollow;
+                transform.position = CheckForCollision(Player.position, FixedFollow);
         }
     }
 

@@ -7,6 +7,20 @@ public abstract class PlayerCamera : MonoBehaviour
     float _moveDuration = 1;
 
     protected bool _inPosition = false;
+    protected RaycastHit _hit;
+    protected static LayerMask _layerMask;
+
+    private void Awake()
+    {
+        _layerMask = LayerMask.GetMask("Player", "Targetable");
+    }
+
+    protected Vector3 CheckForCollision(Vector3 sourcePosition, Vector3 cameraPosition)
+    {
+        var direction = cameraPosition - sourcePosition;
+        bool colliding = Physics.Raycast(sourcePosition, direction.normalized, out _hit, direction.magnitude, ~(_layerMask));
+        return colliding ? _hit.point : cameraPosition;
+    }
 
     protected IEnumerator MoveToPosition(Transform newTransform)
     {
