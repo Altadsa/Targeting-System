@@ -20,13 +20,14 @@ public class FirstPersonCamera : PlayerCamera
 
     private void OnEnable()
     {
-        StartCoroutine(MoveToPosition(_fpView));
+        _player.DisableMovement();
+        StartCoroutine(MoveToPosition(_fpView.position));
         _hookshotUi.ShowUi();
     }
 
     private void OnDisable()
     {
-
+        _player.EnableMovement();
         _hookshotUi.HideUi();
     }
 
@@ -45,7 +46,10 @@ public class FirstPersonCamera : PlayerCamera
     private void LateUpdate()
     {
         if (_inPosition)
+        {
             transform.position = _fpView.position;
+        }
+
     }
 
 }

@@ -33,27 +33,44 @@ public class PlayerController : MonoBehaviour
         _directionToFace = HasInput ? CameraMovement.normalized : transform.forward;
 
 
-        if (_targetingCamera.enabled)
+        if (_canMove)
         {
-            GetComponent<Animator>().SetBool("HasTarget", true);
-            transform.forward = Vector3.Scale(GetTargetForward(), new Vector3(1, 0, 1).normalized);
+            if (_targetingCamera.enabled)
+            {
+                GetComponent<Animator>().SetBool("HasTarget", true);
+                transform.forward = Vector3.Scale(GetTargetForward(), new Vector3(1, 0, 1).normalized);
+            }
+            else
+            {
+                GetComponent<Animator>().SetBool("HasTarget", false);
+                GetComponent<Animator>().SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z));
+                Model.forward = HasInput ? CameraMovement.normalized : Model.forward;
+                transform.forward = Vector3.Lerp(transform.forward, _directionToFace, Time.deltaTime);
+            } 
+            transform.position += CameraMovement.normalized * moveSpeed * Time.deltaTime;
         }
         else
         {
-            GetComponent<Animator>().SetBool("HasTarget", false);
-            GetComponent<Animator>().SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z));
-            Model.forward = HasInput ? CameraMovement.normalized : Model.forward;
             transform.forward = Vector3.Lerp(transform.forward, _directionToFace, Time.deltaTime);
         }
-
-
-        if (_canMove)
-        {
-            transform.position += CameraMovement.normalized * moveSpeed * Time.deltaTime;
-        }
- 
     }
 
+    public void EnableMovement()
+    {
+        var camForward = _mainCamera.ScaledForward();
+        transform.forward = camForward;
+        Model.forward = transform.forward;
+        _canMove = true;
+
+    }
+
+    public void DisableMovement()
+    {
+        var camForward = _mainCamera.ScaledForward();
+        transform.forward = camForward;
+        Model.forward = transform.forward;
+        _canMove = false;
+    }
 
     private Vector3 GetTargetForward()
     {
@@ -62,14 +79,6 @@ public class PlayerController : MonoBehaviour
         newForward.y = 0;
         newForward.Normalize();
         return newForward ;
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawRay(transform.position, transform.forward * 10);
-        Gizmos.color = Color.red;
-        //Gizmos.DrawRay(Model.position, Model.forward * 10);
     }
 
 }
