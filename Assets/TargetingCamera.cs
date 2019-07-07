@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Linq;
+using TMPro;
 using UnityEngine;
 
-public class TargetingCamera : MonoBehaviour
+public class TargetingCamera : PlayerCamera
 {
     // Player and Target transforms
     public Transform Player;
@@ -25,15 +27,18 @@ public class TargetingCamera : MonoBehaviour
 
     private Vector3 _fixedForward;
 
+    //Gets the Fixed position behind the Player
+    private Vector3 FixedFollow => Player.position - _fixedForward * TargetingDistance * 2 + Offset;
+
     //Enable Player ability to move if coming from First Person
     private void OnEnable()
     {
         Target = GetTarget();
         if (!Target)
+        {
             _fixedForward = Player.forward;
-        else
-            Z_TargetLockon.Target = Target;
-
+            StartCoroutine(MoveToFixedForward());
+        }
     }
 
 
@@ -45,9 +50,7 @@ public class TargetingCamera : MonoBehaviour
             _targetMidpoint = Player.position + 0.5f * _midpointVector;
             var camMidAngle = Vector3.SignedAngle((_midpointVector - transform.position).normalized, _midpointVector.normalized, Vector3.up);
             _directionToRotate = camMidAngle >= Mathf.Epsilon;
-
         }
-
     }
 
     private void LateUpdate()
@@ -56,15 +59,35 @@ public class TargetingCamera : MonoBehaviour
         {
             var newPosition = TargetingPosition();
             transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * SpeedOffset);
-            //transform.forward = (_targetMidpoint - transform.position).normalized;
             transform.LookAt(_targetMidpoint);
         }
         else
         {
-            transform.position = Player.position - _fixedForward * TargetingDistance + Offset;
-            transform.forward = _fixedForward;
+            if (_inPosition)
+                transform.position = FixedFollow;
+        }
+    }
+
+
+    IEnumerator MoveToFixedForward()
+    {
+        _inPosition = false;
+        var newPos = FixedFollow;
+        var newRot = Quaternion.LookRotation(Player.position - newPos);
+        var startTime = Time.time;
+        while (Time.time - startTime < 0.5f)
+        {
+            var delta = Time.time - startTime;
+            if (delta > 1)
+            {
+                delta = 1;
+            }
+            transform.position = Vector3.Lerp(transform.position, newPos, delta);
+            transform.rotation = Quaternion.Slerp(transform.rotation, newRot, delta);
+            yield return new WaitForEndOfFrame();
         }
 
+        _inPosition = true;
     }
 
     private Vector3 TargetingPosition()
@@ -81,6 +104,6 @@ public class TargetingCamera : MonoBehaviour
         var frontTargets = targets.Where(t =>
             Vector3.Dot(Player.forward,
                 (t.transform.position - Player.position).normalized) > 0);
-        return frontTargets.OrderBy(t => Vector3.Distance(Player.position, t.transform.position)).First().transform;
+        return frontTargets.OrderBy(t => Vector3.Distance(Player.position, t.transform.position)).FirstOrDefault()?.transform;
     }
 }

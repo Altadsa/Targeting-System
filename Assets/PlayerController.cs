@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     private float x, z;
 
     private Vector3 CameraMovement => _mainCamera.ScaledForward() * z + _mainCamera.ScaledRight() * x;
-
+    private Vector3 _directionToFace;
     private bool HasInput => Mathf.Abs(x) > Mathf.Epsilon || Mathf.Abs(z) > Mathf.Epsilon;
 
     private bool _canMove = true;
@@ -24,51 +24,44 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        //Get Inputs from controller
         x = Input.GetAxisRaw("Horizontal");
         z = Input.GetAxisRaw("Vertical");
-        var newfacingDir = HasInput ? CameraMovement.normalized : transform.forward;
+        z = z < 0 ? z / 2 : z;
+
+        //Determine direction for Player to face
+        _directionToFace = HasInput ? CameraMovement.normalized : transform.forward;
+
+
         if (_targetingCamera.enabled)
         {
             GetComponent<Animator>().SetBool("HasTarget", true);
             transform.forward = Vector3.Scale(GetTargetForward(), new Vector3(1, 0, 1).normalized);
-            Model.forward = GetTargetForward();
         }
         else
         {
             GetComponent<Animator>().SetBool("HasTarget", false);
             GetComponent<Animator>().SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z));
-            if (_canMove)
-                Model.forward = HasInput ? CameraMovement.normalized : Model.forward;
+            Model.forward = HasInput ? CameraMovement.normalized : Model.forward;
+            transform.forward = Vector3.Lerp(transform.forward, _directionToFace, Time.deltaTime);
         }
-        if (z < 0) z /= 2;
+
+
         if (_canMove)
         {
-            transform.position += CameraMovement * moveSpeed * Time.deltaTime;
+            transform.position += CameraMovement.normalized * moveSpeed * Time.deltaTime;
         }
-        transform.forward = Vector3.Lerp(transform.forward, newfacingDir, Time.deltaTime);
+ 
     }
 
-    public void AllowMovement()
-    {
-        _canMove = true;
-        transform.forward = _mainCamera.ScaledForward();
-        Model.forward = _mainCamera.ScaledForward();
-    }
-
-    public void DisableMovement()
-    {
-        _canMove = false;
-        transform.forward = Model.forward;
-        Model.forward = transform.forward;
-    }
 
     private Vector3 GetTargetForward()
     {
-        if (!_targetingCamera.Target) return Model.forward;
+        if (!_targetingCamera.Target) return transform.forward;
         var newForward = _targetingCamera.Target.position - transform.position;
         newForward.y = 0;
         newForward.Normalize();
-        return newForward;
+        return newForward ;
     }
 
     private void OnDrawGizmos()

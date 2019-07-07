@@ -7,40 +7,30 @@ public class FreeCamera : PlayerCamera
     public Transform Player;
     //Free Camera PositionOffset
     public Vector3 PositionOffset;
-    //LookAt Position Offset
-    public Vector3 LookAtOffset;
     //Distance behind the Player to move to
     public float MaxDistance = 3f;
-
+    //Layers to Ignore when checking for Collision
     public LayerMask LayerMask;
 
-    //Property to get the desired position behind the Player
-    private Vector3 CameraPosition => Player.position - Player.forward * MaxDistance + PositionOffset;
 
-    private void OnEnable()
-    {
-        StartCoroutine(MoveToPosition(CameraPosition));
-    }
-
+    //Property to get the desired position relative to the Player
+    private Vector3 CameraPosition => Player.position - Vector3.Scale( (Player.position - transform.position), new Vector3(1,0,1)).normalized * MaxDistance + PositionOffset;
 
     RaycastHit hit;
     private void LateUpdate()
     {
-        transform.LookAt(Player.position + LookAtOffset);
-        if (_inPosition)
-        {
-            var distance = Vector3.Distance(transform.position, CameraPosition);
-            bool colliding = Physics.Raycast(transform.position, transform.forward, out hit, Vector3.Distance(transform.position, Player.position), ~(LayerMask));
-            if (colliding) Debug.Log(hit.collider.gameObject.name);
-            var movePosition = colliding ? hit.point : CameraPosition;
-            transform.position = Vector3.Lerp(transform.position, movePosition, Time.deltaTime * distance);
-        }
+        var lookDirection = (Player.position - transform.position);
+        transform.forward = Vector3.Lerp(transform.forward, lookDirection.normalized, Time.deltaTime * 5f);
+        var newPosition = CheckForCollision(CameraPosition);
+        transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * 5f);
     }
 
-    private void OnDrawGizmos()
+    private Vector3 CheckForCollision(Vector3 cameraPosition)
     {
-        Gizmos.color = Color.green;
-        Gizmos.DrawRay(transform.position, transform.forward*MaxDistance);
+        var direction = cameraPosition - Player.position;
+        bool colliding = Physics.Raycast(Player.position, direction.normalized, out hit, direction.magnitude, ~(LayerMask));
+        if (colliding) Debug.Log($"Hit {hit.collider.gameObject.name}");
+        return colliding ? hit.point : CameraPosition;
     }
 
 }

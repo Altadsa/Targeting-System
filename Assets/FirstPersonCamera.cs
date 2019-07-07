@@ -20,14 +20,13 @@ public class FirstPersonCamera : PlayerCamera
 
     private void OnEnable()
     {
-        _player.DisableMovement();
         StartCoroutine(MoveToPosition(_fpView));
         _hookshotUi.ShowUi();
     }
 
     private void OnDisable()
     {
-        _player.AllowMovement();
+
         _hookshotUi.HideUi();
     }
 

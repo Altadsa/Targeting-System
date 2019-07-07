@@ -10,6 +10,7 @@ public abstract class PlayerCamera : MonoBehaviour
 
     protected IEnumerator MoveToPosition(Transform newTransform)
     {
+        _inPosition = false;
         _startMove = Time.time;
         while (Time.time - _startMove < _moveDuration)
         {
@@ -29,6 +30,7 @@ public abstract class PlayerCamera : MonoBehaviour
 
     protected IEnumerator MoveToPosition(Vector3 newPosition)
     {
+        _inPosition = false;
         _startMove = Time.time;
         while (Time.time - _startMove < _moveDuration)
         {
