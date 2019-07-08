@@ -19,7 +19,7 @@ public class FreeCamera : PlayerCamera
 
     private void OnEnable()
     {
-        StartCoroutine(MoveToPosition(InitialPosition));
+        StartCoroutine(MoveToPosition(CheckForCollision(Player.position,InitialPosition)));
     }
 
     private void LateUpdate()

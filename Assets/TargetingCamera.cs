@@ -71,10 +71,10 @@ public class TargetingCamera : PlayerCamera
     IEnumerator MoveToFixedForward()
     {
         _inPosition = false;
-        var newPos = FixedFollow;
+        var newPos = CheckForCollision(Player.position, FixedFollow);
         var newRot = Quaternion.LookRotation(Player.position - newPos);
         var startTime = Time.time;
-        while (Time.time - startTime < 0.5f)
+        while (Time.time - startTime < MOVE_DURATION)
         {
             var delta = Time.time - startTime;
             if (delta > 1)

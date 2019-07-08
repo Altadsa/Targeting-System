@@ -4,8 +4,7 @@ using UnityEngine;
 public abstract class PlayerCamera : MonoBehaviour
 {
     float _startMove = 0;
-    float _moveDuration = 0.5f;
-
+    protected const float MOVE_DURATION = 0.5f;
     protected bool _inPosition = false;
     protected RaycastHit _hit;
     protected static LayerMask _layerMask;
@@ -26,10 +25,10 @@ public abstract class PlayerCamera : MonoBehaviour
     {
         _inPosition = false;
         _startMove = Time.time;
-        while (Time.time - _startMove < _moveDuration)
+        while (Time.time - _startMove < MOVE_DURATION)
         {
             var delta = Time.time - _startMove;
-            delta /= _moveDuration;
+            delta /= MOVE_DURATION;
             if (delta > 1)
             {
                 delta = 1;
