@@ -81,4 +81,10 @@ public class PlayerController : MonoBehaviour
         return newForward ;
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawRay(transform.position, transform.forward * 10);
+    }
+
 }
