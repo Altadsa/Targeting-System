@@ -4,7 +4,7 @@ using UnityEngine;
 public abstract class PlayerCamera : MonoBehaviour
 {
     float _startMove = 0;
-    float _moveDuration = 1;
+    float _moveDuration = 0.5f;
 
     protected bool _inPosition = false;
     protected RaycastHit _hit;

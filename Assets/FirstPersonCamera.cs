@@ -10,8 +10,8 @@ public class FirstPersonCamera : PlayerCamera
 
     const float MAX_VERTICAL = 75f;
 
-    float  _verticalThrow;
-    float _verticalAngle = 0;
+    float  _verticalThrow, _horizontalThrow;
+    float _verticalAngle = 0, _horizontalAngle = 0;
 
     private void Awake()
     {
@@ -29,14 +29,18 @@ public class FirstPersonCamera : PlayerCamera
     {
         _player.EnableMovement();
         _hookshotUi.HideUi();
+        _verticalAngle = 0;
+        _horizontalAngle = 0;
     }
 
     private void Update()
     {
         _verticalThrow = -Input.GetAxisRaw("Vertical");
+        _horizontalThrow = Input.GetAxisRaw("Horizontal");
         if (_inPosition)
         {
             _verticalAngle += _verticalThrow * Speed * Time.deltaTime;
+            _horizontalAngle += _horizontalThrow * Speed * Time.deltaTime;
             var horizontalRot = Quaternion.AngleAxis(_player.transform.eulerAngles.y, Vector3.up);
             var verticalRot = Quaternion.AngleAxis(_verticalAngle, Vector3.right);
             transform.rotation = horizontalRot * verticalRot;
