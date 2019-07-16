@@ -8,10 +8,11 @@ public abstract class PlayerCamera : MonoBehaviour
     protected bool _inPosition = false;
     protected RaycastHit _hit;
     protected static LayerMask _layerMask;
-
+    protected static Camera _mainCamera;
     private void Awake()
     {
         _layerMask = LayerMask.GetMask("Player", "Targetable");
+        _mainCamera = GetComponent<Camera>();
     }
 
     protected Vector3 CheckForCollision(Vector3 sourcePosition, Vector3 cameraPosition)

@@ -4,12 +4,17 @@ using UnityEngine;
 
 public class TargetingCamera : PlayerCamera
 {
+    [Header ("Targets")]
     // Player and Target transforms
     public Transform Player;
     public Transform Target;
-    public Vector3 Offset;
+
+    [Header("Variables")]
+    public Vector3 PositionOffset;
+    public Vector3 TargetingArea;
     public float SpeedOffset = 5;
 
+    [Tooltip("The Targetable GameObjects Layer")]
     public LayerMask LayerMask;
 
     //The angle between the midpoint of the Targets and the Camera
@@ -27,7 +32,7 @@ public class TargetingCamera : PlayerCamera
     private Vector3 _fixedForward;
 
     //Gets the Fixed position behind the Player
-    private Vector3 FixedFollow => Player.position - _fixedForward * TargetingDistance * 2 + Offset;
+    private Vector3 FixedFollow => Player.position - _fixedForward * TargetingDistance * 2 + PositionOffset;
 
     //Enable Player ability to move if coming from First Person
     private void OnEnable()
@@ -93,16 +98,24 @@ public class TargetingCamera : PlayerCamera
     {
         var rot = !_directionToRotate ? OFFSET : -OFFSET;
         var rotFor = Quaternion.AngleAxis(rot, Vector3.up) * -Vector3.Scale(_midpointVector, new Vector3(1,0,1)).normalized;
-        return Player.position + rotFor * TargetingDistance + Offset;
+        return Player.position + rotFor * TargetingDistance + PositionOffset;
     }
 
     private Transform GetTarget()
     {
-        var targets = Physics.OverlapBox(Player.position + Player.forward*10, new Vector3(20, 10, 10), Quaternion.identity, LayerMask).ToList();
+        var targets = Physics.OverlapBox(Player.position + Player.forward * TargetingArea.z/2, TargetingArea, Quaternion.identity, LayerMask).ToList();
         if (targets.Count == 0) return null;
-        var frontTargets = targets.Where(t =>
-            Vector3.Dot(Player.forward,
-                (t.transform.position - Player.position).normalized) > 0);
+
+        var frontTargets = targets.Where(IsTargetInCameraView);
         return frontTargets.OrderBy(t => Vector3.Distance(Player.position, t.transform.position)).FirstOrDefault()?.transform;
+    }
+
+    private bool IsTargetInCameraView(Collider targetCollider)
+    {
+        var planes = GeometryUtility.CalculateFrustumPlanes(_mainCamera);
+        var inPlane = GeometryUtility.TestPlanesAABB(planes, targetCollider.bounds);
+        var infront = Vector3.Dot(Player.forward,
+                          (targetCollider.transform.position - Player.position).normalized) > 0;
+        return infront && inPlane;
     }
 }
