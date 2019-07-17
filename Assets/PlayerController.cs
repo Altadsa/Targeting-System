@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
 
@@ -9,6 +8,9 @@ public class PlayerController : MonoBehaviour
     public TargetingCamera _targetingCamera;
     public float moveSpeed = 10;
     public Transform Model;
+
+    public Vector3 SmoothVelocity;
+    public float SmoothTime;
 
     Camera _mainCamera;
     private float x, z;
@@ -50,13 +52,13 @@ public class PlayerController : MonoBehaviour
                 GetComponent<Animator>().SetBool("HasTarget", false);
                 GetComponent<Animator>().SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z));
                 Model.forward = HasInput ? CameraMovement.normalized : Model.forward;
-                transform.forward = Vector3.Lerp(transform.forward, _directionToFace, Time.deltaTime);
+                transform.forward = Vector3.SmoothDamp(transform.forward, _directionToFace, ref SmoothVelocity, SmoothTime);
             }
             transform.position += MoveSpeed;
         }
         else
         {
-            transform.forward = Vector3.Lerp(transform.forward, _directionToFace, Time.deltaTime);
+            transform.forward = Vector3.SmoothDamp(transform.forward, _directionToFace, ref SmoothVelocity, SmoothTime);
         }
     }
 
