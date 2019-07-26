@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     public Vector3 SmoothVelocity;
     public float SmoothTime;
 
+    Animator _animator;
     Camera _mainCamera;
     private float x, z;
 
@@ -24,6 +25,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        _animator = GetComponentInChildren<Animator>();
         _mainCamera = Camera.main;
     }
 
@@ -43,17 +45,19 @@ public class PlayerController : MonoBehaviour
         {
             if (_targetingCamera.enabled)
             {
-                GetComponent<Animator>().SetBool("HasTarget", true);
+                _animator.SetBool("HasTarget", true);
+                _animator.SetFloat("Directîon", x);
                 transform.forward = Vector3.Scale(GetTargetForward(), new Vector3(1, 0, 1).normalized);
                 Model.forward = GetTargetForward();
             }
             else
             {
-                GetComponent<Animator>().SetBool("HasTarget", false);
-                GetComponent<Animator>().SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z));
+                _animator.SetBool("HasTarget", false);
+
                 Model.forward = HasInput ? CameraMovement.normalized : Model.forward;
                 transform.forward = Vector3.SmoothDamp(transform.forward, _directionToFace, ref SmoothVelocity, SmoothTime);
             }
+            _animator.SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z));
             transform.position += MoveSpeed;
         }
         else
