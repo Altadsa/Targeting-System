@@ -57,8 +57,29 @@ public class PlayerController : MonoBehaviour
                 Model.forward = HasInput ? CameraMovement.normalized : Model.forward;
                 transform.forward = Vector3.SmoothDamp(transform.forward, _directionToFace, ref SmoothVelocity, SmoothTime);
             }
-            _animator.SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z));
-            transform.position += MoveSpeed;
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                _animator.SetBool("Block", true);
+            }
+
+            if (Input.GetMouseButtonUp(1))
+            {
+                _animator.SetBool("Block", false);
+            }
+
+            if (!_animator.GetBool("Block"))
+            {
+                _animator.SetFloat("MoveForce", Mathf.Abs(x) + Mathf.Abs(z * 2));
+            }
+
+            if (Input.GetMouseButtonDown(0)) _animator.SetTrigger("Attack");
+
+            if (_animator.GetFloat("MoveForce") > Mathf.Epsilon)
+            {
+                transform.position += MoveSpeed;
+            }
+
         }
         else
         {
